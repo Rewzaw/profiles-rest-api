@@ -1,14 +1,15 @@
 from django.http import response
 from rest_framework import status, viewsets
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.views import APIView, Response
 
-from .serializers import HelloSerializer
+from . import models, permissions, serializers
 
 
 class HelloApiView(APIView):
     """Test APIView"""
 
-    serializer_class = HelloSerializer
+    serializer_class = serializers.HelloSerializer
 
     def get(self, request, format=None):
         """Just a get request that in this case returns an_apiview list below and a hello message"""
@@ -64,7 +65,7 @@ class HelloApiView(APIView):
 class HelloViewSet(viewsets.ViewSet):
     """Test ViewSet"""
 
-    serializer_class = HelloSerializer
+    serializer_class = serializers.HelloSerializer
 
     def list(self, request):
         """Just a get request that in this case returns a_viewset list below and a hello message"""
@@ -119,3 +120,12 @@ class HelloViewSet(viewsets.ViewSet):
 
         response = {'method': 'DELETE'}
         return Response(response)
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    """Handle creating and updating profiles"""
+
+    serializer_class = serializers.UserProfileSerializer
+    queryset = models.UserProfile.objects.all()
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.UpdateOwnProfile,)
